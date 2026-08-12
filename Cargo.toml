@@ -1,0 +1,129 @@
+[package]
+name = "esp32-s3-scrypt-miner"
+version = "0.1.0"
+edition = "2021"
+description = "Scrypt proof-of-work miner for ESP32-2432S028 (Cheap Yellow Display)"
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+
+[lib]
+name = "esp32_s3_scrypt_miner"
+path = "src/lib.rs"
+
+[[bin]]
+name = "esp32-s3-scrypt-miner"
+path = "src/bin/main.rs"
+required-features = ["esp"]
+
+[[bin]]
+name = "host-miner"
+path = "src/bin/host_miner.rs"
+required-features = ["host"]
+
+[[bin]]
+name = "host-gui"
+path = "src/bin/host_gui.rs"
+required-features = ["host-gui"]
+
+[[bin]]
+name = "cyd-companion"
+path = "src/bin/cyd_companion.rs"
+required-features = ["companion"]
+
+[features]
+default = ["esp", "lite"]
+# Cross-compile firmware for ESP32-2432S028 (CYD / Cheap Yellow Display)
+esp = [
+    "dep:esp-hal",
+    "dep:esp-rtos",
+    "dep:esp-bootloader-esp-idf",
+    "dep:esp-alloc",
+    "dep:esp-backtrace",
+    "dep:esp-println",
+    "dep:esp-radio",
+    "dep:embassy-executor",
+    "dep:embassy-time",
+    "dep:embassy-sync",
+    "dep:embassy-net",
+    "dep:embassy-futures",
+    "dep:static_cell",
+    "dep:mipidsi",
+    "dep:embedded-graphics",
+    "dep:embedded-hal",
+    "dep:embedded-hal-bus",
+    "dep:embedded-io",
+    "dep:embedded-io-async",
+    "dep:esp-storage",
+    "dep:embedded-storage",
+    "dep:log",
+]
+# Desktop demo / benchmarking of the same miner core
+host = []
+# Desktop GUI (eframe/egui) on top of the host miner core
+host-gui = ["host", "dep:eframe", "dep:egui"]
+# Windows/Linux LAN companion — settings + overclock for the CYD board
+companion = [
+    "host",
+    "dep:eframe",
+    "dep:egui",
+    "dep:egui_extras",
+    "dep:ureq",
+    "dep:serde",
+    "dep:serde_json",
+    "dep:image",
+    "dep:serialport",
+]
+# Low-memory Litecoin scrypt (N=1024 TMTO, 8 KiB V) — required on classic ESP32 with WiFi
+lite = []
+
+[dependencies]
+heapless = "0.8"
+sha2 = { version = "0.10", default-features = false }
+hmac = { version = "0.12", default-features = false }
+pbkdf2 = { version = "0.12", default-features = false, features = ["hmac"] }
+eframe = { version = "=0.27.2", optional = true, default-features = true, features = ["persistence"] }
+egui = { version = "=0.27.2", optional = true }
+egui_extras = { version = "=0.27.2", optional = true, features = ["image"] }
+ureq = { version = "2.12", optional = true, default-features = true, features = ["json"] }
+serde = { version = "1", optional = true, features = ["derive"] }
+serde_json = { version = "1", optional = true }
+image = { version = "0.25", optional = true, default-features = false, features = ["png"] }
+serialport = { version = "4.6", optional = true, default-features = true }
+
+# ESP32 (CYD) firmware dependencies (enabled with `--features esp`)
+esp-hal = { version = "1.1.1", features = ["esp32", "log-04", "unstable"], optional = true }
+esp-rtos = { version = "0.3.0", features = ["embassy", "esp-alloc", "esp-radio", "esp32", "log-04"], optional = true }
+esp-bootloader-esp-idf = { version = "0.5.0", features = ["esp32", "log-04"], optional = true }
+esp-alloc = { version = "0.10.0", optional = true }
+esp-backtrace = { version = "0.19.0", features = ["esp32", "panic-handler", "println"], optional = true }
+# UART0 (CH340 USB-UART on CYD) for credentials + logs
+esp-println = { version = "0.17.0", default-features = false, features = ["esp32", "log-04", "uart"], optional = true }
+# WiFi only — BLE/`coex` is RAM-heavy on classic ESP32 and unused by this firmware.
+esp-radio = { version = "1.0.0-beta.0", features = ["esp32", "wifi", "log-04", "unstable"], optional = true }
+embedded-io = { version = "0.6", optional = true }
+embedded-io-async = { version = "0.7", optional = true }
+esp-storage = { version = "0.9", features = ["esp32"], optional = true }
+embedded-storage = { version = "0.3", optional = true }
+embassy-executor = { version = "0.10.0", features = ["log"], optional = true }
+embassy-time = { version = "0.5.1", features = ["log"], optional = true }
+embassy-sync = { version = "0.8.0", optional = true }
+embassy-net = { version = "0.9.0", features = ["dhcpv4", "medium-ethernet", "tcp", "udp", "dns"], optional = true }
+embassy-futures = { version = "0.1", optional = true }
+static_cell = { version = "2.1.1", optional = true }
+mipidsi = { version = "0.10.0", optional = true }
+embedded-graphics = { version = "0.8.2", optional = true }
+embedded-hal = { version = "1.0.0", optional = true }
+embedded-hal-bus = { version = "0.1", optional = true }
+log = { version = "0.4", optional = true }
+
+[profile.dev]
+opt-level = "s"
+
+[profile.release]
+codegen-units = 1
+debug = 2
+debug-assertions = false
+incremental = false
+lto = "thin"
+opt-level = 3
+overflow-checks = false

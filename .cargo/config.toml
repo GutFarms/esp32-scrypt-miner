@@ -1,0 +1,21 @@
+[target.xtensa-esp32-none-elf]
+runner = "espflash flash --monitor"
+rustflags = [
+    "-C", "link-arg=-Tlinkall.x",
+    "-C", "link-arg=-nostartfiles",
+]
+
+[target.x86_64-pc-windows-gnu]
+linker = "x86_64-w64-mingw32-gcc"
+
+[env]
+ESP_LOG = "info"
+
+# Firmware for ESP32-2432S028 (CYD) — lite = N=1024 TMTO (8 KiB V) for RAM:
+#   . $HOME/export-esp.sh
+#   cargo +esp run -Zbuild-std=core,alloc --release \
+#     --target xtensa-esp32-none-elf --features esp,lite
+# Host tests / demo:
+#   cargo test --no-default-features
+#   cargo test --no-default-features --features lite
+#   cargo run --no-default-features --features host --bin host-miner --release

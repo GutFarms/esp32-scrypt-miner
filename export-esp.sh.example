@@ -1,0 +1,19 @@
+# Copy to export-esp.sh (gitignored) or source after espup install:
+#   . $HOME/export-esp.sh
+#
+# Typical espup layout (adjust version dirs if needed):
+export LIBCLANG_PATH="${LIBCLANG_PATH:-$HOME/.rustup/toolchains/esp/xtensa-esp32-elf-clang/esp-20.1.1_20250829/esp-clang/lib}"
+# Also try /usr/local/rustup if present:
+if [[ ! -d "$LIBCLANG_PATH" && -d /usr/local/rustup/toolchains/esp ]]; then
+  export LIBCLANG_PATH="/usr/local/rustup/toolchains/esp/xtensa-esp32-elf-clang/esp-20.1.1_20250829/esp-clang/lib"
+fi
+ESP_GCC_BIN="${ESP_GCC_BIN:-}"
+for d in \
+  /usr/local/rustup/toolchains/esp/xtensa-esp-elf/esp-15.2.0_20250920/xtensa-esp-elf/bin \
+  "$HOME/.rustup/toolchains/esp/xtensa-esp-elf/esp-15.2.0_20250920/xtensa-esp-elf/bin"
+do
+  if [[ -d "$d" ]]; then ESP_GCC_BIN="$d"; break; fi
+done
+if [[ -n "$ESP_GCC_BIN" ]]; then
+  export PATH="$ESP_GCC_BIN:$PATH"
+fi

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CYD — one-click install</title>
+  <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="bg"></div>
+  <main>
+    <header>
+      <p class="brand">Japan-central</p>
+      <h1>One-click install</h1>
+      <p class="lede">Uses ESP Web Tools. Prefer the <a href="./">drag &amp; drop flasher</a> if you want to pick any <code>.bin</code>.</p>
+    </header>
+    <esp-web-install-button manifest="./manifest.json"></esp-web-install-button>
+    <p class="status">Chrome / Edge only. Serve via <code>scripts/serve-web-flasher.sh</code>.</p>
+  </main>
+</body>
+</html>

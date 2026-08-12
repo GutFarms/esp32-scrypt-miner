@@ -1,0 +1,16 @@
+{
+  "name": "ESP32-2432S028 Scrypt Miner",
+  "version": "0.1.0",
+  "new_install_prompt_erase": false,
+  "builds": [
+    {
+      "chipFamily": "ESP32",
+      "parts": [
+        {
+          "path": "../esp32-2432s028-scrypt-miner-merged.bin",
+          "offset": 0
+        }
+      ]
+    }
+  ]
+}
